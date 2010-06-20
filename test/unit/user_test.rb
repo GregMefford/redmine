@@ -55,6 +55,21 @@ class UserTest < ActiveSupport::TestCase
     assert user.save
   end
   
+  context "User.login" do
+    should "be case-insensitive." do
+      u = User.new(:firstname => "new", :lastname => "user", :mail => "newuser@somenet.foo")
+      u.login = 'newuser'
+      u.password, u.password_confirmation = "password", "password"
+      assert u.save
+      
+      u = User.new(:firstname => "Similar", :lastname => "User", :mail => "similaruser@somenet.foo")
+      u.login = 'NewUser'
+      u.password, u.password_confirmation = "password", "password"
+      assert !u.save
+      assert_equal I18n.translate('activerecord.errors.messages.taken'), u.errors.on(:login)
+    end
+  end
+
   def test_mail_uniqueness_should_not_be_case_sensitive
     u = User.new(:firstname => "new", :lastname => "user", :mail => "newuser@somenet.foo")
     u.login = 'newuser1'
