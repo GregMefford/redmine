@@ -103,6 +103,14 @@ class UserTest < ActiveSupport::TestCase
     assert_equal 1, @admin.errors.count
   end
   
+  context "User#try_to_login" do
+    should "fall-back to case-insensitive if user login is not found as-typed." do
+      user = User.try_to_login("AdMin", "admin")
+      assert_kind_of User, user
+      assert_equal "admin", user.login
+    end
+  end
+
   def test_password
     user = User.try_to_login("admin", "admin")
     assert_kind_of User, user
